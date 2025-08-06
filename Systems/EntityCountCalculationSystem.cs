@@ -121,8 +121,8 @@ namespace ShowEntityLimit.Systems
             Mod.log.Info("---Total Buildings: " + m_BuildingCount);
             Mod.log.Info("---Total Citizens: " + m_CitizenCount);
             Mod.log.Info("---Total Vehicles: " + m_VehicleCount);
-            Mod.log.Info("---Total Plants: " + m_VehicleCount);
-            Mod.log.Info("---Total Net Segments: " + m_VehicleCount);
+            Mod.log.Info("---Total Plants: " + m_PlantCount);
+            Mod.log.Info("---Total Net Segments: " + m_NetEdgeCount);
             Mod.log.Info("---Other Entities: " + m_OtherEntityCount);
         }
 
