@@ -10,20 +10,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="578c1cef-cad9-4429-b06a-f41bab0fb417" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mod.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ModAssemblyInfo/ModAssemblyInfo.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ModAssemblyInfo/ModAssemblyInfo.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ModSettings/LocaleEN.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ModSettings/ModSettings.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Properties/PublishConfiguration.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Properties/PublishProfiles/PublishNewMod.pubxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Properties/PublishProfiles/PublishNewVersion.pubxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Properties/PublishProfiles/UpdatePublishedConfiguration.pubxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Properties/Thumbnail.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ShowEntityLimit.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ShowEntityLimit.sln" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Systems/EntityCountCalculationSystem.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Extensions/ExtendedUISystemBase.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Systems/UI/EntityCountUI.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/src/StyleBindings.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/src/mods/MainWindow.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/src/mods/Mainwindow.module.scss" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/UI/src/mods/bindings.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.ShowEntityLimit/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ShowEntityLimit/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mod.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Mod.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ModAssemblyInfo/ModAssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/ModAssemblyInfo/ModAssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ShowEntityLimit.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/ShowEntityLimit.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Systems/EntityCountCalculationSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Systems/EntityCountSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/src/mods/ShowEntityLimitWindow.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/UI/mod.json.csproj" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,16 +32,32 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;cloudgal42&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/cloudgal42/CS2-ShowEntityLimit.git&quot;,
+    &quot;accountId&quot;: &quot;51680d1d-f031-46eb-b35c-2b123670db93&quot;
+  }
+}</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/f539b356a552460880371c76b71887be7e200/f3/8254a438/IDictionarySource.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Extensions/ExtendedUISystemBase.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Mod.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/ModSettings/ModSettings.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Systems/EntityCountCalculationSystem.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="30u1oHSwWyKK0orcgikEhGvtypG" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -62,6 +77,7 @@
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.sourceCode.C#",
+    "ts.external.directory.path": "E:\\Other code projects\\ShowEntityLimit\\UI\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -100,16 +116,31 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1754462818841</updated>
-      <workItem from="1754462819723" duration="8547000" />
+      <workItem from="1754462819723" duration="12349000" />
+      <workItem from="1754475400734" duration="67000" />
+      <workItem from="1754475636565" duration="13086000" />
+      <workItem from="1754569373882" duration="23608000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="UnityProjectDiscoverer">
     <option name="hasUnityReference" value="true" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />

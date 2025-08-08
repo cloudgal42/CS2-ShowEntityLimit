@@ -1,5 +1,6 @@
-using System.ComponentModel;
-using Colossal.Logging;
+using Unity.Entities;
+using Unity.Collections; 
+
 using Game;
 using Game.Buildings;
 using Game.Common;
@@ -8,12 +9,10 @@ using Game.Net;
 using Game.Objects;
 using Game.Tools;
 using Game.Vehicles;
-using Unity.Entities;
-using Debug = UnityEngine.Debug;
 
 namespace ShowEntityLimit.Systems
 {
-    public partial class EntityCountCalculationSystem : GameSystemBase
+    public partial class EntityCountSystem : GameSystemBase
     {
         private EntityQuery m_Query;
         private EntityQuery m_BuildingQuery;
@@ -29,13 +28,17 @@ namespace ShowEntityLimit.Systems
         private int m_PlantCount;
         private int m_NetEdgeCount;
         private int m_OtherEntityCount;
+
+        public NativeArray<int> m_Results;
         
         //TODO: Make this update interval adjustable in settings
-        private const int kSystemUpdateInterval = 1024;
+        public const int kSystemUpdateInterval = 1024;
         
         protected override void OnCreate()
-        {
-            base.OnCreate(); 
+        {  
+            base.OnCreate();
+            //NOTE: Change the length whenever a new count is implemented
+            m_Results = new NativeArray<int>(7, Allocator.Persistent);
             m_Query = GetEntityQuery(new EntityQueryDesc
             {
                 None = new ComponentType[]
@@ -116,6 +119,15 @@ namespace ShowEntityLimit.Systems
             m_NetEdgeCount = m_NetEdgeQuery.CalculateEntityCount();
             
             m_OtherEntityCount = m_TotalEntityCount - m_BuildingCount - m_VehicleCount - m_CitizenCount - m_PlantCount - m_NetEdgeCount;
+
+            m_Results[(int)EntityCountType.TotalEntityCount] = m_TotalEntityCount;
+            m_Results[(int)EntityCountType.BuildingCount] = m_BuildingCount;
+            m_Results[(int)EntityCountType.CitizenCount] = m_CitizenCount;
+            m_Results[(int)EntityCountType.VehicleCount] = m_VehicleCount;
+            m_Results[(int)EntityCountType.PlantCount] = m_PlantCount;
+            m_Results[(int)EntityCountType.NetEdgeCount] = m_NetEdgeCount;
+            m_Results[(int)EntityCountType.OtherEntityCount] = m_OtherEntityCount;
+                
             //TODO: Implement UI for this
             Mod.log.Info("Current Total Entities in Game: " + m_TotalEntityCount);
             Mod.log.Info("---Total Buildings: " + m_BuildingCount);
@@ -130,5 +142,22 @@ namespace ShowEntityLimit.Systems
         {
             return kSystemUpdateInterval;
         }
+
+        protected override void OnDestroy()
+        {
+            m_Results.Dispose();
+            base.OnDestroy();
+        }
+    }
+
+    public enum EntityCountType
+    {
+        TotalEntityCount,
+        BuildingCount,
+        CitizenCount,
+        VehicleCount,
+        PlantCount,
+        NetEdgeCount,
+        OtherEntityCount
     }
 }

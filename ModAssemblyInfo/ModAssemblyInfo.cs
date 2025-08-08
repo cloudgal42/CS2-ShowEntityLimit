@@ -12,6 +12,6 @@ namespace ShowEntityLimit
         public const string Name        = "ShowEntityLimit";
         public const string Version     = "0.1.0";
         public const string Title       = "Show Entity Limit";
-        public const string Description = "Shows the current and maximum number of entities that can exist in Cities: Skylines 2 ";
+        public const string Description = "Shows the current and maximum number of entities that exists in a Cities: Skylines 2 save ";
     }
 }

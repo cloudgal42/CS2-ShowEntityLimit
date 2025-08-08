@@ -5,6 +5,7 @@ using Game.SceneFlow;
 using Colossal.IO.AssetDatabase;
 using Game.Input;
 using ShowEntityLimit.Systems;
+using ShowEntityLimit.Systems.UI;
 using UnityEngine;
 
 namespace ShowEntityLimit
@@ -14,6 +15,8 @@ namespace ShowEntityLimit
         public static ILog log = LogManager.GetLogger($"{nameof(ShowEntityLimit)}.{nameof(Mod)}")
             .SetShowsErrorsInUI(false);
 
+        public static readonly string Id = ModAssemblyInfo.Name;
+        
         private ModSettings m_ModSettings;
         public static ProxyAction m_ButtonAction;
         public static ProxyAction m_AxisAction;
@@ -30,7 +33,8 @@ namespace ShowEntityLimit
             if (GameManager.instance.modManager.TryGetExecutableAsset(this, out var asset))
                 log.Info($"Current mod asset at {asset.path}");
             
-            updateSystem.UpdateAfter<EntityCountCalculationSystem>(SystemUpdatePhase.GameSimulation);
+            updateSystem.UpdateAfter<EntityCountUI>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateAfter<EntityCountSystem>(SystemUpdatePhase.GameSimulation);
 
             m_ModSettings = new ModSettings(this);
             m_ModSettings.RegisterInOptionsUI();
