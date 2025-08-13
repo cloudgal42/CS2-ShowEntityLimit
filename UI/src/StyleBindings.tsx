@@ -20,7 +20,12 @@ export const tintedIconStyle = getModule(
     "game-ui/common/image/tinted-icon.module.scss",
     "classes"
 );
+export const foldoutStyle = getModule(
+    "game-ui/common/foldout/foldout-item.module.scss",
+    "classes"
+)
 
-
+//TODO: Do guesswork for foldoutClass
+// export const foldoutClass = `${}`
 export const closeButtonClass = `${closeButtonStyle.button} ${panelStyle.closeButton}`;
 export const closeButtonImageClass = `${tintedIconStyle.tintedIcon} ${iconStyle.icon}`;

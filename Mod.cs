@@ -32,6 +32,9 @@ namespace ShowEntityLimit
 
             if (GameManager.instance.modManager.TryGetExecutableAsset(this, out var asset))
                 log.Info($"Current mod asset at {asset.path}");
+            #if DEBUG 
+                log.Info("Currently on " + ModAssemblyInfo.Title + " DEBUG build");
+            #endif
             
             updateSystem.UpdateAfter<EntityCountUI>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAfter<EntityCountSystem>(SystemUpdatePhase.GameSimulation);

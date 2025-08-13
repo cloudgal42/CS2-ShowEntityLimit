@@ -1,32 +1,30 @@
 .panel {
-    width: 400rem;
+    width: 350rem;
 }
 .container {
     margin: 10rem;
 }
-.row, .inner-container {
+.row {
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
 }
-.col, .col-wide {
-    display: flex;
-    flex-direction: column;
-}
-.col {
-    margin-left: 5rem;
-}
-.col-wide {
-    flex-basis: 0;
-    flex-grow: 2;
-}
-.data, .data-num, .col, .row-header {
+.data, .data-num, .col {
     flex-basis: 0;
     flex-grow: 1;
+}
+.data, .data-num {
+    font-size: 14rem;
+    color: lightgray;
+    margin-bottom: 5rem;
+}
+.data {
+    width: 140rem;
 }
 .data-num {
     text-align: right;
 }
 .row-header {
     font-weight: bold;
+    display: flex;
 }

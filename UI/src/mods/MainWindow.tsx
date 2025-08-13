@@ -17,11 +17,31 @@ enum EntityCountType {
     VehicleCount,
     PlantCount,
     NetEdgeCount,
+    NetLaneCount,
+    AreaCount,
+    PropertyRenterCount,
     OtherEntityCount
 }
 
-export const MainWindow = ({onClose}:DraggablePanelProps) => {
-    const countArray = useValue(EntityCountArray)
+function calculateEntityPercentage(entityCount: number, totalEntityCount: number): string {
+    let percentage = 100 * (entityCount / totalEntityCount);
+    if (totalEntityCount === 0) {
+        return "0%";
+    }
+    if (percentage < 1) {
+        return "<1%";
+    }
+    else {
+        return Math.round(percentage) + "%";
+    }
+}
+interface EntityTypeCountProps {
+    index: number;
+}
+
+export const MainWindow = () => {
+    const countArray = useValue(EntityCountArray);
+    const entityType = ["Total", "Building", "Citizen", "Vehicle", "Plants", "Net Segments", "Netlanes", "Areas", "Property Renters", "Other Entities"];
     const TotalEntityCountSection = () => {
         const totalCount = countArray[EntityCountType.TotalEntityCount];
         const totalCountData = totalCount + "/" + ENTITY_INDEX_LIMIT;
@@ -32,12 +52,29 @@ export const MainWindow = ({onClose}:DraggablePanelProps) => {
             </div>
         );
     }
-    //TODO: 1) Make this more scalable and follow React best practices
-    //TODO: 2) Change the count by Entity type to a JSX table
+    
+    const TableHeader = () => {
+        return (
+            <div className={styles.rowHeader}>
+                <div className={styles.data}>Objects</div>
+                <div className={styles.dataNum}>Count</div>
+                <div className={styles.dataNum}>% of Total</div>
+            </div>
+        );
+    }
+    const EntityTypeCountSection = ({index}: EntityTypeCountProps) => {
+        return (
+            <div className={styles.row}>
+                <div className={styles.data}>{entityType[index]}</div>
+                <div className={styles.dataNum}>{countArray[index]}</div>
+                <div className={styles.dataNum}>{calculateEntityPercentage(countArray[index], countArray[EntityCountType.TotalEntityCount])}</div>
+            </div>
+        );
+    }
+    //TODO: 1) Make each data entry be managed by a separated const for better readability
     return (
         <Panel
             draggable={true}
-            onClose={onClose}
             className={styles.panel}
             header={
                 <div className={panelStyle.titleBar}>
@@ -55,37 +92,17 @@ export const MainWindow = ({onClose}:DraggablePanelProps) => {
         >   
             <div className={styles.container}>
                 <TotalEntityCountSection></TotalEntityCountSection>
-                <div className={styles.innerContainer}>
-                    <div className={styles.colWide}>
-                        <div className={styles.rowHeader}>Object</div>
-                        {/*Data*/}
-                        <div className={styles.data}>Buildings</div>
-                        <div className={styles.data}>Citizens</div>
-                        <div className={styles.data}>Vehicles</div>
-                        <div className={styles.data}>Plants</div>
-                        <div className={styles.data}>Net Edge</div>
-                        <div className={styles.data}>Other</div>
-                    </div>
-                    <div className={styles.col}>
-                        <div className={styles.rowHeader}>Count</div>
-                        {/*Data*/}
-                        <div className={styles.dataNum}>{countArray[EntityCountType.BuildingCount]}</div>
-                        <div className={styles.dataNum}>{countArray[EntityCountType.CitizenCount]}</div>
-                        <div className={styles.dataNum}>{countArray[EntityCountType.VehicleCount]}</div>
-                        <div className={styles.dataNum}>{countArray[EntityCountType.PlantCount]}</div>
-                        <div className={styles.dataNum}>{countArray[EntityCountType.NetEdgeCount]}</div>
-                        <div className={styles.dataNum}>{countArray[EntityCountType.OtherEntityCount]}</div>
-                    </div>
-                    <div className={styles.col}>
-                        <div className={styles.rowHeader}>% of Total</div>
-                        {/*Data*/}
-                        <div className={styles.dataNum}>42%</div>
-                        <div className={styles.dataNum}>42%</div>
-                        <div className={styles.dataNum}>42%</div>
-                        <div className={styles.dataNum}>42%</div>
-                        <div className={styles.dataNum}>42%</div>
-                        <div className={styles.dataNum}>42%</div>
-                    </div>
+                <div>
+                    <TableHeader />
+                    <EntityTypeCountSection index={EntityCountType.BuildingCount} />
+                    <EntityTypeCountSection index={EntityCountType.CitizenCount} />
+                    <EntityTypeCountSection index={EntityCountType.PropertyRenterCount} />
+                    <EntityTypeCountSection index={EntityCountType.VehicleCount} />
+                    <EntityTypeCountSection index={EntityCountType.PlantCount} />
+                    <EntityTypeCountSection index={EntityCountType.NetEdgeCount} />
+                    <EntityTypeCountSection index={EntityCountType.NetLaneCount} />
+                    <EntityTypeCountSection index={EntityCountType.AreaCount} />
+                    <EntityTypeCountSection index={EntityCountType.OtherEntityCount} />
                 </div>
             </div>
         </Panel>
