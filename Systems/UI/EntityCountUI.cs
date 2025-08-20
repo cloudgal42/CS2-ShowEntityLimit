@@ -7,17 +7,24 @@ namespace ShowEntityLimit.Systems.UI
     public partial class EntityCountUI : ExtendedUISystemBase
     {
         private EntityCountSystem m_EntityCountSystem;
-        private GetterValueBinding<int[]> m_EntityCountBinding;
+        private GetterValueBinding<int[]> m_EntityTypeBinding;
+        private GetterValueBinding<int[]> m_TotalEntityBinding;
 
         protected override void OnCreate()
         {
             base.OnCreate();
-           
-            m_EntityCountBinding = CreateBinding("EntityCount", () =>
+            
+            m_TotalEntityBinding = CreateBinding("TotalEntityCount", () =>
+            {
+                m_EntityCountSystem = base.World.GetOrCreateSystemManaged<EntityCountSystem>();
+                return m_EntityCountSystem.m_TotalEntityResults.ToArray();
+            });
+            m_EntityTypeBinding = CreateBinding("EntityTypeCount", () =>
             {   
                 m_EntityCountSystem = base.World.GetOrCreateSystemManaged<EntityCountSystem>();
-                return m_EntityCountSystem.m_Results.ToArray();
+                return m_EntityCountSystem.m_EntityTypeResults.ToArray();
             });
+            
         }
 
         public override int GetUpdateInterval(SystemUpdatePhase phase)
@@ -27,7 +34,8 @@ namespace ShowEntityLimit.Systems.UI
 
         protected override void OnUpdate()
         {
-            m_EntityCountBinding.Update();
+            m_TotalEntityBinding.Update();
+            m_EntityTypeBinding.Update();
         }
     }
 }

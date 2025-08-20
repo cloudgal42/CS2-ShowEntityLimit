@@ -25,6 +25,7 @@ namespace ShowEntityLimit.Systems
         private EntityQuery m_NetLaneQuery;
         private EntityQuery m_PropertyRenterQuery;
         
+        //TODO: Change m_TotalEntityCount to count all entities, incld temp ones
         private int m_TotalEntityCount;
         private int m_BuildingCount;
         private int m_VehicleCount;
@@ -36,7 +37,8 @@ namespace ShowEntityLimit.Systems
         private int m_NetLaneCount;
         private int m_PropertyRenterCount;
 
-        public NativeArray<int> m_Results;
+        public NativeArray<int> m_TotalEntityResults;
+        public NativeArray<int> m_EntityTypeResults;
         
         //TODO: Make this update interval adjustable in settings
         public const int kSystemUpdateInterval = 256;
@@ -45,9 +47,9 @@ namespace ShowEntityLimit.Systems
         {  
             base.OnCreate();
             //NOTE: Change the length whenever a new count is implemented
-            //TODO: Add NetObject (low priority), Game.Companies.CompanyData, Game.Citizens.Household
-            //Can be generalized as a PropertyRenter (separation between 2 can be done via a job)
-            m_Results = new NativeArray<int>(10, Allocator.Persistent);
+            //TODO: Add NetObject (low priority), Separate Game.Companies.CompanyData and Game.Citizens.Household
+            m_TotalEntityResults = new NativeArray<int>(3, Allocator.Persistent);
+            m_EntityTypeResults = new NativeArray<int>(9, Allocator.Persistent);
             m_Query = GetEntityQuery(new EntityQueryDesc
             {
                 None = new ComponentType[]
@@ -168,16 +170,17 @@ namespace ShowEntityLimit.Systems
             
             m_OtherEntityCount = m_TotalEntityCount - m_BuildingCount - m_VehicleCount - m_CitizenCount - m_PlantCount - m_NetEdgeCount - m_NetLaneCount - m_AreaCount;
 
-            m_Results[(int)EntityCountType.TotalEntityCount] = m_TotalEntityCount;
-            m_Results[(int)EntityCountType.BuildingCount] = m_BuildingCount;
-            m_Results[(int)EntityCountType.CitizenCount] = m_CitizenCount;
-            m_Results[(int)EntityCountType.VehicleCount] = m_VehicleCount;
-            m_Results[(int)EntityCountType.PlantCount] = m_PlantCount;
-            m_Results[(int)EntityCountType.NetEdgeCount] = m_NetEdgeCount;
-            m_Results[(int)EntityCountType.NetLaneCount] = m_NetLaneCount;
-            m_Results[(int)EntityCountType.AreaCount] = m_AreaCount;
-            m_Results[(int)EntityCountType.PropertyRenterCount] = m_PropertyRenterCount;
-            m_Results[(int)EntityCountType.OtherEntityCount] = m_OtherEntityCount;
+            m_TotalEntityResults[(int)TotalResults.PersistentCount] = m_TotalEntityCount;
+            
+            m_EntityTypeResults[(int)TypeResults.BuildingCount] = m_BuildingCount;
+            m_EntityTypeResults[(int)TypeResults.CitizenCount] = m_CitizenCount;
+            m_EntityTypeResults[(int)TypeResults.VehicleCount] = m_VehicleCount;
+            m_EntityTypeResults[(int)TypeResults.PlantCount] = m_PlantCount;
+            m_EntityTypeResults[(int)TypeResults.NetEdgeCount] = m_NetEdgeCount;
+            m_EntityTypeResults[(int)TypeResults.NetLaneCount] = m_NetLaneCount;
+            m_EntityTypeResults[(int)TypeResults.AreaCount] = m_AreaCount;
+            m_EntityTypeResults[(int)TypeResults.PropertyRenterCount] = m_PropertyRenterCount;
+            m_EntityTypeResults[(int)TypeResults.OtherEntityCount] = m_OtherEntityCount;
         }
 
         public override int GetUpdateInterval(SystemUpdatePhase phase)
@@ -187,14 +190,21 @@ namespace ShowEntityLimit.Systems
 
         protected override void OnDestroy()
         {
-            m_Results.Dispose();
+            m_TotalEntityResults.Dispose();
+            m_EntityTypeResults.Dispose();
             base.OnDestroy();
         }
     }
 
-    public enum EntityCountType
+    public enum TotalResults
     {
-        TotalEntityCount,
+        TotalCount,
+        PersistentCount,
+        TempCount
+    }
+    
+    public enum TypeResults
+    {
         BuildingCount,
         CitizenCount,
         VehicleCount,

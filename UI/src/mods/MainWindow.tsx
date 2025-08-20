@@ -1,6 +1,6 @@
 import React, {FC} from "react";
-import {EntityCountArray, ENTITY_INDEX_LIMIT} from "./bindings";
-import {DraggablePanelProps, Panel} from "cs2/ui";
+import {ENTITY_INDEX_LIMIT, EntityTypeCount, TotalEntityCount} from "./bindings";
+import {Panel} from "cs2/ui";
 import {
     closeButtonImageClass,
     panelStyle,
@@ -10,8 +10,7 @@ import {
 import styles from "./Mainwindow.module.scss"
 import {useValue} from "cs2/api";
 
-enum EntityCountType {
-    TotalEntityCount,
+enum TypeResults {
     BuildingCount,
     CitizenCount,
     VehicleCount,
@@ -23,12 +22,18 @@ enum EntityCountType {
     OtherEntityCount
 }
 
+enum TotalResults {
+    TotalCount,
+    PersistentCount,
+    TempCount
+}
+
 function calculateEntityPercentage(entityCount: number, totalEntityCount: number): string {
     let percentage = 100 * (entityCount / totalEntityCount);
     if (totalEntityCount === 0) {
         return "0%";
     }
-    if (percentage < 1) {
+    else if (percentage < 1) {
         return "<1%";
     }
     else {
@@ -40,10 +45,49 @@ interface EntityTypeCountProps {
 }
 
 export const MainWindow = () => {
-    const countArray = useValue(EntityCountArray);
-    const entityType = ["Total", "Building", "Citizen", "Vehicle", "Plants", "Net Segments", "Netlanes", "Areas", "Property Renters", "Other Entities"];
-    const TotalEntityCountSection = () => {
-        const totalCount = countArray[EntityCountType.TotalEntityCount];
+    const totalCountArray = useValue(TotalEntityCount);
+    const typeCountArray = useValue(EntityTypeCount);
+    
+    //TODO: Make this all into a for loop?
+    const entityTypeArray = [{
+        id: 0,
+        type: "Building",
+        count: typeCountArray[TypeResults.BuildingCount]
+    }, {
+        id: 1,
+        type: "Citizen",
+        count: typeCountArray[TypeResults.CitizenCount]
+    }, {
+        id: 2,
+        type: "Vehicle",
+        count: typeCountArray[TypeResults.VehicleCount]
+    }, {
+        id: 3,
+        type: "Plants",
+        count: typeCountArray[TypeResults.PlantCount]
+    }, {
+        id: 4,
+        type: "Net Segments",
+        count: typeCountArray[TypeResults.NetEdgeCount]
+    }, {
+        id: 5,
+        type: "Netlanes",
+        count: typeCountArray[TypeResults.NetLaneCount]
+    }, {
+        id: 6,
+        type: "Areas",
+        count: typeCountArray[TypeResults.AreaCount]
+    }, {
+        id: 7,
+        type: "Property Renters",
+        count: typeCountArray[TypeResults.PropertyRenterCount]
+    }, {
+        id: 8,
+        type: "Other Entities",
+        count: typeCountArray[TypeResults.OtherEntityCount]
+    }];
+    const TotalEntitySection = () => {
+        const totalCount = totalCountArray[TotalResults.PersistentCount];
         const totalCountData = totalCount + "/" + ENTITY_INDEX_LIMIT;
         return (
             <div className={styles.row}>
@@ -52,7 +96,6 @@ export const MainWindow = () => {
             </div>
         );
     }
-    
     const TableHeader = () => {
         return (
             <div className={styles.rowHeader}>
@@ -62,16 +105,20 @@ export const MainWindow = () => {
             </div>
         );
     }
-    const EntityTypeCountSection = ({index}: EntityTypeCountProps) => {
+    const EntityTypeRow = () => {
+        const rowEntry = entityTypeArray.map(entity => {
+            return (
+                <div className={styles.row} key={entity.id}>
+                    <div className={styles.data}>{entity.type}</div>
+                    <div className={styles.dataNum}>{entity.count}</div>
+                    <div className={styles.dataNum}>{calculateEntityPercentage(entity.count, totalCountArray[TotalResults.PersistentCount])}</div>
+                </div>
+            );
+        })
         return (
-            <div className={styles.row}>
-                <div className={styles.data}>{entityType[index]}</div>
-                <div className={styles.dataNum}>{countArray[index]}</div>
-                <div className={styles.dataNum}>{calculateEntityPercentage(countArray[index], countArray[EntityCountType.TotalEntityCount])}</div>
-            </div>
-        );
+            <div>{rowEntry}</div>
+        )
     }
-    //TODO: 1) Make each data entry be managed by a separated const for better readability
     return (
         <Panel
             draggable={true}
@@ -91,18 +138,10 @@ export const MainWindow = () => {
             }
         >   
             <div className={styles.container}>
-                <TotalEntityCountSection></TotalEntityCountSection>
+                <TotalEntitySection />
                 <div>
                     <TableHeader />
-                    <EntityTypeCountSection index={EntityCountType.BuildingCount} />
-                    <EntityTypeCountSection index={EntityCountType.CitizenCount} />
-                    <EntityTypeCountSection index={EntityCountType.PropertyRenterCount} />
-                    <EntityTypeCountSection index={EntityCountType.VehicleCount} />
-                    <EntityTypeCountSection index={EntityCountType.PlantCount} />
-                    <EntityTypeCountSection index={EntityCountType.NetEdgeCount} />
-                    <EntityTypeCountSection index={EntityCountType.NetLaneCount} />
-                    <EntityTypeCountSection index={EntityCountType.AreaCount} />
-                    <EntityTypeCountSection index={EntityCountType.OtherEntityCount} />
+                    <EntityTypeRow />
                 </div>
             </div>
         </Panel>
