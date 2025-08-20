@@ -12,6 +12,8 @@
     <list default="true" id="578c1cef-cad9-4429-b06a-f41bab0fb417" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ShowEntityLimit/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ShowEntityLimit/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Systems/EntityCountSystem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Systems/EntityCountSystem.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/UI/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/UI/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/src/mods/MainWindow.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/UI/src/mods/MainWindow.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -116,7 +118,7 @@
       <workItem from="1755147089582" duration="66000" />
       <workItem from="1755147171619" duration="3925000" />
       <workItem from="1755182185790" duration="19000" />
-      <workItem from="1755311290067" duration="31109000" />
+      <workItem from="1755311290067" duration="41518000" />
     </task>
     <servers />
   </component>

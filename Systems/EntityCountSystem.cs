@@ -7,46 +7,26 @@ using Game.Buildings;
 using Game.Common;
 using Game.Citizens;
 using Game.Companies;
+using Game.Creatures;
 using Game.Net;
 using Game.Objects;
 using Game.Prefabs;
 using Game.Simulation;
 using Game.Tools;
 using Game.Vehicles;
+using Marker = Game.Objects.Marker;
 
 namespace ShowEntityLimit.Systems
 {
     public partial class EntityCountSystem : GameSystemBase
-    {
+    {   
+        //TODO: Reduce # of EntityQuery by offloading 1 query to process in an IJobChunk
         private EntityQuery m_Query;
-        private EntityQuery m_BuildingQuery;
-        private EntityQuery m_VehicleQuery;
-        private EntityQuery m_CitizenQuery;
-        private EntityQuery m_PlantQuery;
-        private EntityQuery m_NetEdgeQuery;
-        private EntityQuery m_AreaQuery;
-        private EntityQuery m_NetLaneQuery;
-        private EntityQuery m_HouseholdQuery;
-        private EntityQuery m_CompanyQuery;
-        private EntityQuery m_FlowNodeQuery;
-        private EntityQuery m_FlowEdgeQuery;
-        private EntityQuery m_PrefabQuery;
+        private NativeArray<EntityQuery> m_QueryArray;
         
         //TODO: Change m_TotalEntityCount to count all entities, incld temp ones
         private int m_TotalEntityCount;
-        private int m_BuildingCount;
-        private int m_VehicleCount;
-        private int m_CitizenCount;
-        private int m_PlantCount;
-        private int m_NetEdgeCount;
         private int m_OtherEntityCount;
-        private int m_AreaCount;
-        private int m_NetLaneCount;
-        private int m_HouseholdCount;
-        private int m_CompanyCount;
-        private int m_FlowNodeCount;
-        private int m_FlowEdgeCount;
-        private int m_PrefabCount;
 
         public NativeArray<int> m_TotalEntityResults;
         public NativeArray<int> m_EntityTypeResults;
@@ -58,10 +38,11 @@ namespace ShowEntityLimit.Systems
         {  
             base.OnCreate();
             //NOTE: Change the length whenever a new count is implemented
-            //TODO: Add NetObject (low priority), Creatures, Prefabs
             //TODO: Long-term: Group queries to several types (Game.Objects.Object, Networks, Netlanes, Misc)i s
+            m_QueryArray = new NativeArray<EntityQuery>(15, Allocator.Persistent);
+            
             m_TotalEntityResults = new NativeArray<int>(3, Allocator.Persistent);
-            m_EntityTypeResults = new NativeArray<int>(13, Allocator.Persistent);
+            m_EntityTypeResults = new NativeArray<int>(15, Allocator.Persistent);
             m_Query = GetEntityQuery(new EntityQueryDesc
             {
                 None = new ComponentType[]
@@ -70,7 +51,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_BuildingQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.Building] = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -82,7 +63,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_CitizenQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.Citizen] = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -94,7 +75,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_VehicleQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.Vehicle] = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -106,7 +87,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_PlantQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.Plant] = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -118,7 +99,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_NetEdgeQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.NetEdge] = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -130,7 +111,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_NetLaneQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.NetLane] = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -142,7 +123,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_AreaQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.Area] = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -154,7 +135,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_HouseholdQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.Household] = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -166,7 +147,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_CompanyQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.Company] = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -178,7 +159,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_FlowNodeQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.FlowNode] = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -190,7 +171,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_FlowEdgeQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.FlowEdge] = GetEntityQuery(new EntityQueryDesc
             {
                 Any = new ComponentType[]
                 {
@@ -203,7 +184,7 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_PrefabQuery = GetEntityQuery(new EntityQueryDesc
+            m_QueryArray[(int)Type.Prefab] = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
@@ -215,47 +196,51 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
+            m_QueryArray[(int)Type.Creature] = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[]
+                {
+                    ComponentType.ReadOnly<Creature>() 
+                },
+                None = new ComponentType[]
+                {
+                    ComponentType.Exclude<Deleted>(),
+                    ComponentType.Exclude<Temp>()
+                }
+            });
+            m_QueryArray[(int)Type.Prop] = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[]
+                {
+                    ComponentType.ReadOnly<Object>(),
+                    ComponentType.ReadOnly<Static>() 
+                },
+                None = new ComponentType[]
+                {
+                    ComponentType.Exclude<Deleted>(),
+                    ComponentType.Exclude<Temp>(),
+                    ComponentType.Exclude<Marker>(),
+                    ComponentType.Exclude<Building>(),
+                    ComponentType.Exclude<Plant>(),
+                    ComponentType.Exclude<Creature>(),
+                    ComponentType.Exclude<Vehicle>(),
+                }
+            });
         }
 
         protected override void OnUpdate()
         {
             m_TotalEntityCount = m_Query.CalculateEntityCount();
-            
-            m_BuildingCount = m_BuildingQuery.CalculateEntityCount();
-            m_CitizenCount = m_CitizenQuery.CalculateEntityCount();
-            m_VehicleCount = m_VehicleQuery.CalculateEntityCount();
-            m_PlantCount = m_PlantQuery.CalculateEntityCount();
-            m_NetEdgeCount = m_NetEdgeQuery.CalculateEntityCount();
-            m_NetLaneCount = m_NetLaneQuery.CalculateEntityCount();
-            m_AreaCount = m_AreaQuery.CalculateEntityCount();
-            m_HouseholdCount = m_HouseholdQuery.CalculateEntityCount();
-            m_CompanyCount = m_CompanyQuery.CalculateEntityCount();
-            m_FlowNodeCount = m_FlowNodeQuery.CalculateEntityCount();
-            m_FlowEdgeCount = m_FlowEdgeQuery.CalculateEntityCount();
-            m_PrefabCount = m_PrefabQuery.CalculateEntityCount();
-
-            m_TotalEntityResults[(int)TotalResults.PersistentCount] = m_TotalEntityCount;
-            
-            m_EntityTypeResults[(int)TypeResults.BuildingCount] = m_BuildingCount;
-            m_EntityTypeResults[(int)TypeResults.CitizenCount] = m_CitizenCount;
-            m_EntityTypeResults[(int)TypeResults.VehicleCount] = m_VehicleCount;
-            m_EntityTypeResults[(int)TypeResults.PlantCount] = m_PlantCount;
-            m_EntityTypeResults[(int)TypeResults.NetEdgeCount] = m_NetEdgeCount;
-            m_EntityTypeResults[(int)TypeResults.NetLaneCount] = m_NetLaneCount;
-            m_EntityTypeResults[(int)TypeResults.AreaCount] = m_AreaCount;
-            m_EntityTypeResults[(int)TypeResults.HouseholdCount] = m_HouseholdCount;
-            m_EntityTypeResults[(int)TypeResults.CompanyCount] = m_CompanyCount;
-            m_EntityTypeResults[(int)TypeResults.FlowNodeCount] = m_FlowNodeCount;
-            m_EntityTypeResults[(int)TypeResults.FlowEdgeCount] = m_FlowEdgeCount;
-            m_EntityTypeResults[(int)TypeResults.PrefabCount] = m_PrefabCount;
-
             m_OtherEntityCount = m_TotalEntityCount;
+            
             for (int i = 0; i < m_EntityTypeResults.Length - 1; i++)
-            {
+            {   
+                m_EntityTypeResults[i] = m_QueryArray[i].CalculateEntityCount();
                 m_OtherEntityCount -= m_EntityTypeResults[i];
             }
             
-            m_EntityTypeResults[(int)TypeResults.OtherEntityCount] = m_OtherEntityCount;
+            m_TotalEntityResults[(int)TotalResults.PersistentCount] = m_TotalEntityCount;
+            m_EntityTypeResults[(int)Type.OtherEntity] = m_OtherEntityCount;
         }
 
         public override int GetUpdateInterval(SystemUpdatePhase phase)
@@ -265,12 +250,12 @@ namespace ShowEntityLimit.Systems
 
         protected override void OnDestroy()
         {
+            m_QueryArray.Dispose();
             m_TotalEntityResults.Dispose();
             m_EntityTypeResults.Dispose();
             base.OnDestroy();
         }
     }
-
     public enum TotalResults
     {
         TotalCount,
@@ -278,20 +263,22 @@ namespace ShowEntityLimit.Systems
         TempCount
     }
     
-    public enum TypeResults
+    public enum Type
     {
-        BuildingCount,
-        CitizenCount,
-        VehicleCount,
-        PlantCount,
-        NetEdgeCount,
-        NetLaneCount,
-        AreaCount,
-        HouseholdCount,
-        CompanyCount,
-        FlowNodeCount,
-        FlowEdgeCount,
-        PrefabCount,
-        OtherEntityCount
+        Building,
+        Citizen,
+        Vehicle,
+        Plant,
+        NetEdge,
+        NetLane,
+        Area,
+        Household,
+        Company,
+        FlowNode,
+        FlowEdge,
+        Prefab,
+        Creature,
+        Prop,
+        OtherEntity
     }
 }
