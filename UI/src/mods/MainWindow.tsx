@@ -18,74 +18,60 @@ enum TypeResults {
     NetEdgeCount,
     NetLaneCount,
     AreaCount,
-    PropertyRenterCount,
+    HouseholdCount,
+    CompanyCount,
+    FlowNodeCount,
+    FlowEdgeCount,
+    PrefabCount,
     OtherEntityCount
 }
-
 enum TotalResults {
     TotalCount,
     PersistentCount,
     TempCount
 }
-
-function calculateEntityPercentage(entityCount: number, totalEntityCount: number): string {
-    let percentage = 100 * (entityCount / totalEntityCount);
-    if (totalEntityCount === 0) {
-        return "0%";
-    }
-    else if (percentage < 1) {
-        return "<1%";
-    }
-    else {
-        return Math.round(percentage) + "%";
-    }
-}
-interface EntityTypeCountProps {
-    index: number;
+interface EntityType {
+    id: number;
+    type: string;
+    count: number;
 }
 
 export const MainWindow = () => {
     const totalCountArray = useValue(TotalEntityCount);
     const typeCountArray = useValue(EntityTypeCount);
-    
-    //TODO: Make this all into a for loop?
-    const entityTypeArray = [{
-        id: 0,
-        type: "Building",
-        count: typeCountArray[TypeResults.BuildingCount]
-    }, {
-        id: 1,
-        type: "Citizen",
-        count: typeCountArray[TypeResults.CitizenCount]
-    }, {
-        id: 2,
-        type: "Vehicle",
-        count: typeCountArray[TypeResults.VehicleCount]
-    }, {
-        id: 3,
-        type: "Plants",
-        count: typeCountArray[TypeResults.PlantCount]
-    }, {
-        id: 4,
-        type: "Net Segments",
-        count: typeCountArray[TypeResults.NetEdgeCount]
-    }, {
-        id: 5,
-        type: "Netlanes",
-        count: typeCountArray[TypeResults.NetLaneCount]
-    }, {
-        id: 6,
-        type: "Areas",
-        count: typeCountArray[TypeResults.AreaCount]
-    }, {
-        id: 7,
-        type: "Property Renters",
-        count: typeCountArray[TypeResults.PropertyRenterCount]
-    }, {
-        id: 8,
-        type: "Other Entities",
-        count: typeCountArray[TypeResults.OtherEntityCount]
-    }];
+    const entityType = [
+        "Buildings",
+        "Citizens",
+        "Vehicles",
+        "Plants",
+        "Net Segments",
+        "Netlanes",
+        "Areas",
+        "Households",
+        "Companies",
+        "Flow Nodes",
+        "Flow Segments",
+        "Prefabs",
+        "Other Entities"
+    ];
+    const entityTypeArray: EntityType[] = entityType.map((type, i) => ({
+        id: i,
+        type,
+        count: typeCountArray[i] ?? 0
+    }));
+    const calculateEntityPercentage = (entityCount: number, totalEntityCount: number): string => {
+        let percentage = 100 * (entityCount / totalEntityCount);
+        if (totalEntityCount === 0) {
+            return "0%";
+        }
+        else if (percentage < 1) {
+            return "<1%";
+        }
+        else {
+            return Math.round(percentage) + "%";
+        }
+    }
+
     const TotalEntitySection = () => {
         const totalCount = totalCountArray[TotalResults.PersistentCount];
         const totalCountData = totalCount + "/" + ENTITY_INDEX_LIMIT;

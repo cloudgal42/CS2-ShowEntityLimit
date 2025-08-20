@@ -6,8 +6,11 @@ using Game.Areas;
 using Game.Buildings;
 using Game.Common;
 using Game.Citizens;
+using Game.Companies;
 using Game.Net;
 using Game.Objects;
+using Game.Prefabs;
+using Game.Simulation;
 using Game.Tools;
 using Game.Vehicles;
 
@@ -23,7 +26,11 @@ namespace ShowEntityLimit.Systems
         private EntityQuery m_NetEdgeQuery;
         private EntityQuery m_AreaQuery;
         private EntityQuery m_NetLaneQuery;
-        private EntityQuery m_PropertyRenterQuery;
+        private EntityQuery m_HouseholdQuery;
+        private EntityQuery m_CompanyQuery;
+        private EntityQuery m_FlowNodeQuery;
+        private EntityQuery m_FlowEdgeQuery;
+        private EntityQuery m_PrefabQuery;
         
         //TODO: Change m_TotalEntityCount to count all entities, incld temp ones
         private int m_TotalEntityCount;
@@ -35,7 +42,11 @@ namespace ShowEntityLimit.Systems
         private int m_OtherEntityCount;
         private int m_AreaCount;
         private int m_NetLaneCount;
-        private int m_PropertyRenterCount;
+        private int m_HouseholdCount;
+        private int m_CompanyCount;
+        private int m_FlowNodeCount;
+        private int m_FlowEdgeCount;
+        private int m_PrefabCount;
 
         public NativeArray<int> m_TotalEntityResults;
         public NativeArray<int> m_EntityTypeResults;
@@ -47,9 +58,10 @@ namespace ShowEntityLimit.Systems
         {  
             base.OnCreate();
             //NOTE: Change the length whenever a new count is implemented
-            //TODO: Add NetObject (low priority), Separate Game.Companies.CompanyData and Game.Citizens.Household
+            //TODO: Add NetObject (low priority), Creatures, Prefabs
+            //TODO: Long-term: Group queries to several types (Game.Objects.Object, Networks, Netlanes, Misc)i s
             m_TotalEntityResults = new NativeArray<int>(3, Allocator.Persistent);
-            m_EntityTypeResults = new NativeArray<int>(9, Allocator.Persistent);
+            m_EntityTypeResults = new NativeArray<int>(13, Allocator.Persistent);
             m_Query = GetEntityQuery(new EntityQueryDesc
             {
                 None = new ComponentType[]
@@ -142,11 +154,60 @@ namespace ShowEntityLimit.Systems
                     ComponentType.Exclude<Temp>()
                 }
             });
-            m_PropertyRenterQuery = GetEntityQuery(new EntityQueryDesc
+            m_HouseholdQuery = GetEntityQuery(new EntityQueryDesc
             {
                 All = new ComponentType[]
                 {
-                    ComponentType.ReadOnly<PropertyRenter>() 
+                    ComponentType.ReadOnly<Household>() 
+                },
+                None = new ComponentType[]
+                {
+                    ComponentType.Exclude<Deleted>(),
+                    ComponentType.Exclude<Temp>()
+                }
+            });
+            m_CompanyQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[]
+                {
+                    ComponentType.ReadOnly<CompanyData>() 
+                },
+                None = new ComponentType[]
+                {
+                    ComponentType.Exclude<Deleted>(),
+                    ComponentType.Exclude<Temp>()
+                }
+            });
+            m_FlowNodeQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[]
+                {
+                    ComponentType.ReadOnly<ConnectedFlowEdge>() 
+                },
+                None = new ComponentType[]
+                {
+                    ComponentType.Exclude<Deleted>(),
+                    ComponentType.Exclude<Temp>()
+                }
+            });
+            m_FlowEdgeQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                Any = new ComponentType[]
+                {
+                    ComponentType.ReadOnly<ElectricityFlowEdge>(),
+                    ComponentType.ReadOnly<WaterPipeEdge>()
+                },
+                None = new ComponentType[]
+                {
+                    ComponentType.Exclude<Deleted>(),
+                    ComponentType.Exclude<Temp>()
+                }
+            });
+            m_PrefabQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new ComponentType[]
+                {
+                    ComponentType.ReadOnly<PrefabData>() 
                 },
                 None = new ComponentType[]
                 {
@@ -159,6 +220,7 @@ namespace ShowEntityLimit.Systems
         protected override void OnUpdate()
         {
             m_TotalEntityCount = m_Query.CalculateEntityCount();
+            
             m_BuildingCount = m_BuildingQuery.CalculateEntityCount();
             m_CitizenCount = m_CitizenQuery.CalculateEntityCount();
             m_VehicleCount = m_VehicleQuery.CalculateEntityCount();
@@ -166,9 +228,11 @@ namespace ShowEntityLimit.Systems
             m_NetEdgeCount = m_NetEdgeQuery.CalculateEntityCount();
             m_NetLaneCount = m_NetLaneQuery.CalculateEntityCount();
             m_AreaCount = m_AreaQuery.CalculateEntityCount();
-            m_PropertyRenterCount = m_PropertyRenterQuery.CalculateEntityCount();
-            
-            m_OtherEntityCount = m_TotalEntityCount - m_BuildingCount - m_VehicleCount - m_CitizenCount - m_PlantCount - m_NetEdgeCount - m_NetLaneCount - m_AreaCount;
+            m_HouseholdCount = m_HouseholdQuery.CalculateEntityCount();
+            m_CompanyCount = m_CompanyQuery.CalculateEntityCount();
+            m_FlowNodeCount = m_FlowNodeQuery.CalculateEntityCount();
+            m_FlowEdgeCount = m_FlowEdgeQuery.CalculateEntityCount();
+            m_PrefabCount = m_PrefabQuery.CalculateEntityCount();
 
             m_TotalEntityResults[(int)TotalResults.PersistentCount] = m_TotalEntityCount;
             
@@ -179,7 +243,18 @@ namespace ShowEntityLimit.Systems
             m_EntityTypeResults[(int)TypeResults.NetEdgeCount] = m_NetEdgeCount;
             m_EntityTypeResults[(int)TypeResults.NetLaneCount] = m_NetLaneCount;
             m_EntityTypeResults[(int)TypeResults.AreaCount] = m_AreaCount;
-            m_EntityTypeResults[(int)TypeResults.PropertyRenterCount] = m_PropertyRenterCount;
+            m_EntityTypeResults[(int)TypeResults.HouseholdCount] = m_HouseholdCount;
+            m_EntityTypeResults[(int)TypeResults.CompanyCount] = m_CompanyCount;
+            m_EntityTypeResults[(int)TypeResults.FlowNodeCount] = m_FlowNodeCount;
+            m_EntityTypeResults[(int)TypeResults.FlowEdgeCount] = m_FlowEdgeCount;
+            m_EntityTypeResults[(int)TypeResults.PrefabCount] = m_PrefabCount;
+
+            m_OtherEntityCount = m_TotalEntityCount;
+            for (int i = 0; i < m_EntityTypeResults.Length - 1; i++)
+            {
+                m_OtherEntityCount -= m_EntityTypeResults[i];
+            }
+            
             m_EntityTypeResults[(int)TypeResults.OtherEntityCount] = m_OtherEntityCount;
         }
 
@@ -212,7 +287,11 @@ namespace ShowEntityLimit.Systems
         NetEdgeCount,
         NetLaneCount,
         AreaCount,
-        PropertyRenterCount,
+        HouseholdCount,
+        CompanyCount,
+        FlowNodeCount,
+        FlowEdgeCount,
+        PrefabCount,
         OtherEntityCount
     }
 }
