@@ -10,21 +10,6 @@ import {
 import styles from "./Mainwindow.module.scss"
 import {useValue} from "cs2/api";
 
-enum TypeResults {
-    BuildingCount,
-    CitizenCount,
-    VehicleCount,
-    PlantCount,
-    NetEdgeCount,
-    NetLaneCount,
-    AreaCount,
-    HouseholdCount,
-    CompanyCount,
-    FlowNodeCount,
-    FlowEdgeCount,
-    PrefabCount,
-    OtherEntityCount
-}
 enum TotalResults {
     TotalCount,
     PersistentCount,
@@ -52,6 +37,8 @@ export const MainWindow = () => {
         "Flow Nodes",
         "Flow Segments",
         "Prefabs",
+        "Creatures",
+        "Props",
         "Other Entities"
     ];
     const entityTypeArray: EntityType[] = entityType.map((type, i) => ({
@@ -72,9 +59,13 @@ export const MainWindow = () => {
         }
     }
 
+    // TODO: Add color for total count depending on the threshold
+    // <50% 81cd45
+    // <85% ffe57e
+    // >85% e15e49
     const TotalEntitySection = () => {
         const totalCount = totalCountArray[TotalResults.PersistentCount];
-        const totalCountData = totalCount + "/" + ENTITY_INDEX_LIMIT;
+        const totalCountData = totalCount.toLocaleString() + "/" + ENTITY_INDEX_LIMIT;
         return (
             <div className={styles.row}>
                 <div className={styles.data}>Total Entities</div>
@@ -96,7 +87,7 @@ export const MainWindow = () => {
             return (
                 <div className={styles.row} key={entity.id}>
                     <div className={styles.data}>{entity.type}</div>
-                    <div className={styles.dataNum}>{entity.count}</div>
+                    <div className={styles.dataNum}>{entity.count.toLocaleString()}</div>
                     <div className={styles.dataNum}>{calculateEntityPercentage(entity.count, totalCountArray[TotalResults.PersistentCount])}</div>
                 </div>
             );
