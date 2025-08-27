@@ -1,6 +1,6 @@
 import React, {FC} from "react";
 import {ENTITY_INDEX_LIMIT, EntityTypeCount, TotalEntityCount} from "./bindings";
-import {Panel} from "cs2/ui";
+import {Button, Panel} from "cs2/ui";
 import {
     closeButtonImageClass,
     panelStyle,
@@ -9,6 +9,7 @@ import {
 } from "../StyleBindings";
 import styles from "./Mainwindow.module.scss"
 import {useValue} from "cs2/api";
+import {LocalizedNumber, Unit} from "cs2/l10n";
 
 enum TotalResults {
     TotalCount,
@@ -65,30 +66,49 @@ export const MainWindow = () => {
     // >85% e15e49
     const TotalEntitySection = () => {
         const totalCount = totalCountArray[TotalResults.PersistentCount];
-        const totalCountData = totalCount.toLocaleString() + "/" + ENTITY_INDEX_LIMIT;
+        // const totalCountData = totalCount.toLocaleString() + "/" + ENTITY_INDEX_LIMIT;
         return (
             <div className={styles.row}>
-                <div className={styles.data}>Total Entities</div>
-                <div className={styles.dataNum}>{totalCountData}</div>
+                <div className={styles.data}>
+                    Total Entities
+                </div>
+                <div className={styles.dataNum}>
+                    <LocalizedNumber unit={Unit.Integer} value={totalCount}></LocalizedNumber>
+                    {"/"}
+                    <LocalizedNumber unit={Unit.Integer} value={ENTITY_INDEX_LIMIT}></LocalizedNumber>
+                </div>
             </div>
         );
     }
     const TableHeader = () => {
         return (
             <div className={styles.rowHeader}>
-                <div className={styles.data}>Objects</div>
-                <div className={styles.dataNum}>Count</div>
-                <div className={styles.dataNum}>% of Total</div>
+                <div className={styles.data}>
+                    Objects
+                </div>
+                <div className={styles.dataNum}>
+                    Count
+                </div>
+                <div className={styles.dataNum}>
+                    % of Total
+                </div>
             </div>
         );
     }
+    //TODO: use <LocalizedNumber> instead of toLocaleString()
     const EntityTypeRow = () => {
         const rowEntry = entityTypeArray.map(entity => {
             return (
                 <div className={styles.row} key={entity.id}>
-                    <div className={styles.data}>{entity.type}</div>
-                    <div className={styles.dataNum}>{entity.count.toLocaleString()}</div>
-                    <div className={styles.dataNum}>{calculateEntityPercentage(entity.count, totalCountArray[TotalResults.PersistentCount])}</div>
+                    <div className={styles.data}>
+                        {entity.type}
+                    </div>
+                    <div className={styles.dataNum}>
+                        <LocalizedNumber unit={Unit.Integer} value={entity.count}></LocalizedNumber>
+                    </div>
+                    <div className={styles.dataNum}>
+                        {calculateEntityPercentage(entity.count, totalCountArray[TotalResults.PersistentCount])}
+                    </div>
                 </div>
             );
         })
