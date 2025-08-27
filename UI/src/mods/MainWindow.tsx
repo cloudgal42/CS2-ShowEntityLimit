@@ -1,15 +1,23 @@
-import React, {FC} from "react";
-import {ENTITY_INDEX_LIMIT, EntityTypeCount, TotalEntityCount} from "./bindings";
-import {Button, Panel} from "cs2/ui";
+import React from "react";
+import {Panel, Tooltip} from "cs2/ui";
 import {
-    closeButtonImageClass,
-    panelStyle,
-    defaultStyle,
-    closeButtonClass
+    closeButtonClass, 
+    closeButtonImageClass
 } from "../StyleBindings";
+import {
+    ENTITY_INDEX_LIMIT, 
+    EntityTypeCount, 
+    TotalEntityCount
+} from "../bindings";
 import styles from "./Mainwindow.module.scss"
 import {useValue} from "cs2/api";
 import {LocalizedNumber, Unit} from "cs2/l10n";
+import {
+    CountHeaderTooltip, EntityTypeTooltip,
+    ObjectHeaderTooltip,
+    PercentOfTotalTooltip,
+    PersistentCountTooltip
+} from "./TooltipDict";
 
 enum TotalResults {
     TotalCount,
@@ -20,9 +28,24 @@ interface EntityType {
     id: number;
     type: string;
     count: number;
+    percentOfTotal: string;
+    // TODO: Implement tooltip dictionary for each entity type
+    tooltip: string;
 }
 
 export const MainWindow = () => {
+    const calculateEntityPercentage = (entityCount: number) => {
+        let percentage = 100 * (entityCount / totalCountArray[TotalResults.PersistentCount]);
+        if (totalCountArray[TotalResults.PersistentCount] === 0 || entityCount === 0) {
+            return "0%";
+        }
+        else if (percentage < 1) {
+            return "<1%";
+        }
+        else {
+            return `${Math.round(percentage)}%`;
+        }
+    }
     const totalCountArray = useValue(TotalEntityCount);
     const typeCountArray = useValue(EntityTypeCount);
     const entityType = [
@@ -45,69 +68,77 @@ export const MainWindow = () => {
     const entityTypeArray: EntityType[] = entityType.map((type, i) => ({
         id: i,
         type,
-        count: typeCountArray[i] ?? 0
+        count: typeCountArray[i] ?? 0,
+        percentOfTotal: calculateEntityPercentage(typeCountArray[i]),
+        tooltip: EntityTypeTooltip[i]
     }));
-    const calculateEntityPercentage = (entityCount: number, totalEntityCount: number): string => {
-        let percentage = 100 * (entityCount / totalEntityCount);
-        if (totalEntityCount === 0) {
-            return "0%";
+    const GetCountSeverityStyle = (count: number) => {
+        const percentOfMax = 100 * (count / ENTITY_INDEX_LIMIT);
+        if (percentOfMax > 85) {
+            return { color: "#e15e49" }
         }
-        else if (percentage < 1) {
-            return "<1%";
+        else if (percentOfMax > 50) {
+            return { color: "#ffe57e" }
+        }
+        else if (percentOfMax === 0) {
+            return { color: "lightgray"}
         }
         else {
-            return Math.round(percentage) + "%";
+            return { color: "#81cd45" }
         }
     }
-
-    // TODO: Add color for total count depending on the threshold
-    // <50% 81cd45
-    // <85% ffe57e
-    // >85% e15e49
     const TotalEntitySection = () => {
         const totalCount = totalCountArray[TotalResults.PersistentCount];
+        const severityStyle = GetCountSeverityStyle(totalCount);
         // const totalCountData = totalCount.toLocaleString() + "/" + ENTITY_INDEX_LIMIT;
         return (
             <div className={styles.row}>
-                <div className={styles.data}>
-                    Total Entities
-                </div>
-                <div className={styles.dataNum}>
-                    <LocalizedNumber unit={Unit.Integer} value={totalCount}></LocalizedNumber>
-                    {"/"}
-                    <LocalizedNumber unit={Unit.Integer} value={ENTITY_INDEX_LIMIT}></LocalizedNumber>
-                </div>
+                <Tooltip tooltip={PersistentCountTooltip}>
+                    <div className={styles.data}>
+                        Total Entities
+                    </div>
+                </Tooltip>
+                <Tooltip tooltip={PersistentCountTooltip}>
+                    <div className={styles.dataNumLimit}>
+                    <span style={severityStyle}>
+                        <LocalizedNumber unit={Unit.Integer} value={totalCount} />
+                    </span>
+                        {"/"}
+                        <LocalizedNumber unit={Unit.Integer} value={ENTITY_INDEX_LIMIT} />
+                    </div>
+                </Tooltip>
             </div>
         );
     }
     const TableHeader = () => {
         return (
             <div className={styles.rowHeader}>
-                <div className={styles.data}>
-                    Objects
-                </div>
-                <div className={styles.dataNum}>
-                    Count
-                </div>
-                <div className={styles.dataNum}>
-                    % of Total
-                </div>
+                <Tooltip tooltip={ObjectHeaderTooltip}>
+                    <div className={styles.data}>Objects</div>
+                </Tooltip>
+                <Tooltip tooltip={CountHeaderTooltip}>
+                    <div className={styles.dataNum}>Count</div>
+                </Tooltip>
+                <Tooltip tooltip={PercentOfTotalTooltip}>
+                    <div className={styles.dataNum}>% of Total</div>
+                </Tooltip>
             </div>
         );
     }
-    //TODO: use <LocalizedNumber> instead of toLocaleString()
     const EntityTypeRow = () => {
         const rowEntry = entityTypeArray.map(entity => {
             return (
                 <div className={styles.row} key={entity.id}>
-                    <div className={styles.data}>
-                        {entity.type}
-                    </div>
+                    <Tooltip tooltip={entity.tooltip}>
+                        <div className={styles.data}>
+                            {entity.type}
+                        </div>
+                    </Tooltip>
                     <div className={styles.dataNum}>
                         <LocalizedNumber unit={Unit.Integer} value={entity.count}></LocalizedNumber>
                     </div>
                     <div className={styles.dataNum}>
-                        {calculateEntityPercentage(entity.count, totalCountArray[TotalResults.PersistentCount])}
+                        {entity.percentOfTotal}
                     </div>
                 </div>
             );
@@ -120,9 +151,11 @@ export const MainWindow = () => {
         <Panel
             draggable={true}
             className={styles.panel}
-            header={
-                <div className={panelStyle.titleBar}>
-                    <div className={defaultStyle.title}>Show Entity Limit</div>
+            header={(
+                <div className={styles.header}>
+                    <div></div>
+                    <div></div>
+                    <span>Show Entity Limit</span>
                     <button className={closeButtonClass}>
                         <div
                             className={closeButtonImageClass}
@@ -132,7 +165,7 @@ export const MainWindow = () => {
                         </div>
                     </button>
                 </div>
-            }
+            )}
         >   
             <div className={styles.container}>
                 <TotalEntitySection />

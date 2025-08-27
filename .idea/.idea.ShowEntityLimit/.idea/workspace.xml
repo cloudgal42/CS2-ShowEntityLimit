@@ -12,6 +12,7 @@
     <list default="true" id="578c1cef-cad9-4429-b06a-f41bab0fb417" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.ShowEntityLimit/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.ShowEntityLimit/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UI/src/mods/MainWindow.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/UI/src/mods/MainWindow.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI/src/mods/Mainwindow.module.scss" beforeDir="false" afterPath="$PROJECT_DIR$/UI/src/mods/Mainwindow.module.scss" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -116,7 +117,7 @@
       <workItem from="1755147171619" duration="3925000" />
       <workItem from="1755182185790" duration="19000" />
       <workItem from="1755311290067" duration="44778000" />
-      <workItem from="1756216596256" duration="5858000" />
+      <workItem from="1756216596256" duration="7713000" />
     </task>
     <servers />
   </component>

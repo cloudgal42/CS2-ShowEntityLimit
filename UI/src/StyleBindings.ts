@@ -9,7 +9,7 @@ export const panelStyle = getModule(
     "classes"
 );
 export const iconStyle = getModule(
-    "game-ui/common/image/tinted-icon.module.scss",
+    "game-ui/common/input/button/icon-button.module.scss",
     "classes"
 );
 export const closeButtonStyle = getModule(

@@ -1,6 +1,13 @@
 .panel {
     width: 350rem;
 }
+.header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
 .container {
     margin: 10rem;
 }
@@ -9,11 +16,11 @@
     flex-flow: row nowrap;
     justify-content: space-between;
 }
-.data, .data-num, .col {
+.data, .data-num, .data-num-limit, .col {
     flex-basis: 0;
     flex-grow: 1;
 }
-.data, .data-num {
+.data, .data-num, .data-num-limit {
     font-size: 14rem;
     color: lightgray;
     margin-bottom: 5rem;
@@ -21,10 +28,16 @@
 .data {
     width: 140rem;
 }
-.data-num {
+.data-num, .data-num-limit {
     text-align: right;
 }
 .row-header {
     font-weight: bold;
     display: flex;
+    padding-top: 5rem;
+    border-top: 1rem solid gray
+}
+.data-num-limit {
+    display: flex;
+    justify-content: flex-end;
 }
